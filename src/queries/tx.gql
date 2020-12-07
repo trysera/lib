@@ -1,0 +1,11 @@
+query($addr: String!) {
+  transactions(owners: [$addr], first: 1) {
+    edges {
+      node {
+        owner {
+          key
+        }
+      }
+    }
+  }
+}
