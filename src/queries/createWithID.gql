@@ -10,6 +10,9 @@ query($addr: String!, $id: [String!]!) {
     edges {
       node {
         id
+        block {
+          timestamp
+        }
       }
     }
   }

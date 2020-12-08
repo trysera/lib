@@ -1,10 +1,10 @@
 query($addr: String!, $id: [String!]!) {
   transactions(
-    owners: [$addr]
+    recipients: [$addr]
     tags: [
       { name: "App-Name", values: "Sera" }
       { name: "ID", values: $id }
-      { name: "Action", values: "Edit" }
+      { name: "Action", values: "Share" }
     ]
   ) {
     edges {
