@@ -83,7 +83,7 @@ const getLatest = async (
   }
 };
 
-export const getTx = async (tx: string, jwk: JWKInterface) => {
+const getTx = async (tx: string, jwk: JWKInterface) => {
   const key = await getDecryptionKey(jwk);
   const data = await client.transactions.getData(tx, { decode: true });
 
@@ -144,9 +144,14 @@ export const create = async (
     password: string;
   },
   jwk: JWKInterface
-): Promise<string> => {
+): Promise<string | undefined> => {
   const addr = await client.wallets.jwkToAddress(jwk);
   const fee = await getFee("create", addr);
+  if (
+    fee >
+    parseFloat(client.ar.winstonToAr(await client.wallets.getBalance(addr)))
+  )
+    return;
 
   const res = await encryptData(data, (await getEncryptionKey(addr))!);
 
@@ -217,6 +222,64 @@ export const share = async (
   tx.addTag("App-Name", "Sera");
   tx.addTag("ID", id);
   tx.addTag("Action", "Share");
+
+  await client.transactions.sign(tx, jwk);
+  await client.transactions.post(tx);
+
+  return tx.id;
+};
+
+export const edit = async (
+  id: string,
+  data: {
+    username?: string;
+    password?: string;
+  },
+  jwk: JWKInterface
+): Promise<string> => {
+  const addr = await client.wallets.jwkToAddress(jwk);
+  const item = await getTx((await getLatest(id, addr)).tx, jwk);
+
+  const res = await encryptData(
+    {
+      site: item.site,
+      username: data.username || item.username,
+      password: data.password || item.password,
+    },
+    (await getEncryptionKey(addr))!
+  );
+
+  const tx = await client.createTransaction(
+    {
+      data: res,
+    },
+    jwk
+  );
+
+  tx.addTag("App-Name", "Sera");
+  tx.addTag("ID", id);
+  tx.addTag("Action", "Edit");
+
+  await client.transactions.sign(tx, jwk);
+  await client.transactions.post(tx);
+
+  return tx.id;
+};
+
+export const remove = async (
+  id: string,
+  jwk: JWKInterface
+): Promise<string> => {
+  const tx = await client.createTransaction(
+    {
+      data: Math.random().toString().slice(-4),
+    },
+    jwk
+  );
+
+  tx.addTag("App-Name", "Sera");
+  tx.addTag("ID", id);
+  tx.addTag("Action", "Remove");
 
   await client.transactions.sign(tx, jwk);
   await client.transactions.post(tx);
