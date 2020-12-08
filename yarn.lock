@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@limestonefi/api@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@limestonefi/api/-/api-0.1.2.tgz#eb37452ba5a2beede83dee8e965e14cee5e8b8f6"
+  integrity sha512-DoPctY3eGFwGnkqR5Ejom268PSYg+MpHwQ+hTRVrzNUE0YYeKZQYqnVF3vkeHzUdsIaFi/+YbgD+yfl+Cnr7qg==
+  dependencies:
+    ar-gql "^0.0.3"
+    arweave "^1.10.0"
+
 "@rollup/pluginutils@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-3.1.0.tgz#706b4524ee6dc8b103b3c995533e5ad680c02b9b"
@@ -173,6 +181,11 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
+
+nanoid@^3.1.20:
+  version "3.1.20"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
+  integrity sha512-a1cQNyczgKbLX9jwbS/+d7W8fX/RfgYR7lVWwWOGIPNgK2m0MWvrGF6/m4kk6U3QcFMnZf3RIhL0v2Jgh/0Uxw==
 
 node-fetch@^2.6.1:
   version "2.6.1"
