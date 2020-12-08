@@ -1,0 +1,24 @@
+query($addr: String!, $cursor: String) {
+  transactions(
+    owners: [$addr]
+    tags: [
+      { name: "App-Name", values: "Sera" }
+      { name: "Action", values: "Create" }
+    ]
+    after: $cursor
+  ) {
+    pageInfo {
+      hasNextPage
+    }
+    edges {
+      cursor
+      node {
+        id
+        tags {
+          name
+          value
+        }
+      }
+    }
+  }
+}

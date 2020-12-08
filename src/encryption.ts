@@ -9,32 +9,35 @@ const client = new Arweave({
   protocol: "https",
 });
 
-export const encrypt = async (
-  site: string,
-  username: string,
-  password: string,
-  publicKey: CryptoKey
-) => {
-  const dataBuf = new TextEncoder().encode(
-    JSON.stringify({
-      site,
-      username,
-      password,
-    })
-  );
+export const encryptData = async (
+  data: {
+    site: string;
+    username: string;
+    password: string;
+  },
+  key: CryptoKey
+): Promise<Uint8Array> => {
+  const dataBuf = new TextEncoder().encode(JSON.stringify(data));
   const keyBuf = await randomBytes(256);
 
   const encryptedData = await client.crypto.encrypt(dataBuf, keyBuf);
   const encryptedKey = await crypto.subtle.encrypt(
     { name: "RSA-OAEP" },
-    publicKey,
+    key,
     keyBuf
   );
 
   return client.utils.concatBuffers([encryptedKey, encryptedData]);
 };
 
-export const decrypt = async (data: Uint8Array, key: CryptoKey) => {
+export const decryptData = async (
+  data: Uint8Array,
+  key: CryptoKey
+): Promise<{
+  site: string;
+  username: string;
+  password: string;
+}> => {
   const encryptedKey = new Uint8Array(data.slice(0, 512));
   const encryptedData = new Uint8Array(data.slice(512));
 
@@ -44,13 +47,17 @@ export const decrypt = async (data: Uint8Array, key: CryptoKey) => {
     encryptedKey
   );
 
-  return await client.crypto.decrypt(
+  const res = await client.crypto.decrypt(
     encryptedData,
     new Uint8Array(symmetricKey)
   );
+
+  return JSON.parse(client.utils.bufferToString(res));
 };
 
-export const jwkToKey = async (jwk: JWKInterface) => {
+export const getDecryptionKey = async (
+  jwk: JWKInterface
+): Promise<CryptoKey> => {
   const obj = {
     ...jwk,
     alg: "RSA-OAEP-256",
@@ -61,7 +68,9 @@ export const jwkToKey = async (jwk: JWKInterface) => {
   return await crypto.subtle.importKey("jwk", obj, algo, false, ["decrypt"]);
 };
 
-export const getPublicKey = async (addr: string) => {
+export const getEncryptionKey = async (
+  addr: string
+): Promise<CryptoKey | undefined> => {
   const tx = (await run(txQuery, { addr })).data.transactions.edges[0];
 
   if (tx) {
@@ -78,7 +87,7 @@ export const getPublicKey = async (addr: string) => {
   }
 };
 
-const randomBytes = (length: number) => {
+const randomBytes = (length: number): Uint8Array => {
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
   return array;
