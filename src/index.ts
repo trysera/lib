@@ -134,7 +134,7 @@ export const getFee = async (
   if (fee === 0) return 0;
 
   const price = 1 / (await limestone.getPrice("AR")).price;
-  return price * fee;
+  return parseFloat((price * fee).toFixed(4));
 };
 
 export const create = async (
