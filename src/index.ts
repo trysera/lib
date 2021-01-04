@@ -15,6 +15,7 @@ import {
 } from "./encryption";
 // @ts-ignore
 import limestone from "@limestonefi/api";
+import fetch from "node-fetch";
 import { nanoid } from "nanoid";
 
 const client = new Arweave({
@@ -133,7 +134,15 @@ export const getFee = async (
 
   if (fee === 0) return 0;
 
-  const price = 1 / (await limestone.getPrice("AR")).price;
+  let price;
+  try {
+    price = 1 / (await limestone.getPrice("AR")).price;
+  } catch {
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=arweave&vs_currencies=usd"
+    );
+    price = 1 / (await res.clone().json()).arweave.usd;
+  }
   return parseFloat((price * fee).toFixed(4));
 };
 
